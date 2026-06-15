@@ -10,7 +10,14 @@
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
 local LocalPlayer = Players.LocalPlayer
+
+-- Global variables to store our modifications
+local DesiredSpeed = 16
+local DesiredJump = 50
+local InfiniteJumpEnabled = false
 
 local Window = Rayfield:CreateWindow({
    Name = "Dott Universal 🔴",
@@ -30,37 +37,30 @@ local PlayerTab = Window:CreateTab("Player", 4483345998)
 
 PlayerTab:CreateSlider({
    Name = "WalkSpeed",
-   Info = "Changes how fast your character moves.",
+   Info = "Forces your character's speed.",
    Increment = 1,
    Min = 16,
    Max = 250,
    CurrentValue = 16,
    Flag = "SpeedSlider",
    Callback = function(Value)
-        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
-            LocalPlayer.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = Value
-        end
+        DesiredSpeed = Value
    end,
 })
 
 PlayerTab:CreateSlider({
    Name = "JumpPower",
-   Info = "Changes how high you jump.",
+   Info = "Forces your jump height.",
    Increment = 1,
    Min = 50,
    Max = 350,
    CurrentValue = 50,
    Flag = "JumpSlider",
    Callback = function(Value)
-        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
-            local humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-            humanoid.JumpPower = Value
-            humanoid.UseJumpPower = true
-        end
+        DesiredJump = Value
    end,
 })
 
-local InfiniteJumpEnabled = false
 PlayerTab:CreateToggle({
    Name = "Infinite Jump",
    CurrentValue = false,
@@ -70,11 +70,41 @@ PlayerTab:CreateToggle({
    end,
 })
 
-game:GetService("UserInputService").JumpRequest:Connect(function()
-    if InfiniteJumpEnabled then
-        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
-            LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+-- ==========================================
+-- THE FORCE LOOP (Fixes the game resetting your values)
+-- ==========================================
+RunService.RenderStepped:Connect(function()
+    pcall(function()
+        local character = LocalPlayer.Character
+        if character then
+            local humanoid = character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                -- Only override if the user actually changed the slider from default
+                if DesiredSpeed ~= 16 then
+                    humanoid.WalkSpeed = DesiredSpeed
+                end
+                
+                if DesiredJump ~= 50 then
+                    humanoid.UseJumpPower = true
+                    humanoid.JumpPower = DesiredJump
+                end
+            end
         end
+    end)
+end)
+
+-- Infinite Jump Listener
+UserInputService.JumpRequest:Connect(function()
+    if InfiniteJumpEnabled then
+        pcall(function()
+            local character = LocalPlayer.Character
+            if character then
+                local humanoid = character:FindFirstChildOfClass("Humanoid")
+                if humanoid then
+                    humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+                end
+            end
+        end)
     end
 end)
 
