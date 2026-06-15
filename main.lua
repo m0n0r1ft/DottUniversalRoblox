@@ -5,48 +5,37 @@
 -- | |_| | |_| || |   | |  
 -- |____/ \___/ |_|   |_|  UNIVERSAL
 --
--- Created by You • 2026 Visual Suite
+-- Created by You • 2026 Visual Suite (Sirius Rayfield)
 -- ====================================================================
 
--- Load Rayfield UI Library
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
-
--- Setup Core Services
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
--- Create the Main Window
 local Window = Rayfield:CreateWindow({
    Name = "Dott Universal 🔴",
    LoadingTitle = "Dott Suite Loading...",
    LoadingSubtitle = "by You",
    ConfigurationSaving = {
       Enabled = true,
-      FolderName = "DottUniversal", -- Creates a folder in your executor's workspace
+      FolderName = "DottUniversal",
       FileName = "Config"
    },
-   Discord = {
-      Enabled = false,
-      Invite = "", -- Your discord invite link if you make one later
-      RememberWithKey = false
-   },
-   KeySystem = false -- We don't need a key system since it's private to you!
+   Discord = { Enabled = false },
+   KeySystem = false
 })
 
--- ==========================================
--- TAB 1: PLAYER MODIFICATIONS
--- ==========================================
-local PlayerTab = Window:CreateTab("Player", 4483345998) -- Creates a tab with an icon
+-- TAB 1: PLAYER
+local PlayerTab = Window:CreateTab("Player", 4483345998)
 
--- WalkSpeed Slider
-local SpeedSlider = PlayerTab:CreateSlider({
+PlayerTab:CreateSlider({
    Name = "WalkSpeed",
    Info = "Changes how fast your character moves.",
    Increment = 1,
    Min = 16,
    Max = 250,
    CurrentValue = 16,
-   Flag = "SpeedSlider", -- Identifier for config saves
+   Flag = "SpeedSlider",
    Callback = function(Value)
         if LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
             LocalPlayer.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = Value
@@ -54,8 +43,7 @@ local SpeedSlider = PlayerTab:CreateSlider({
    end,
 })
 
--- JumpPower Slider
-local JumpSlider = PlayerTab:CreateSlider({
+PlayerTab:CreateSlider({
    Name = "JumpPower",
    Info = "Changes how high you jump.",
    Increment = 1,
@@ -67,14 +55,13 @@ local JumpSlider = PlayerTab:CreateSlider({
         if LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
             local humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
             humanoid.JumpPower = Value
-            humanoid.UseJumpPower = true -- Force modern game compatibility
+            humanoid.UseJumpPower = true
         end
    end,
 })
 
--- Infinite Jump Toggle
 local InfiniteJumpEnabled = false
-local InfJumpToggle = PlayerTab:CreateToggle({
+PlayerTab:CreateToggle({
    Name = "Infinite Jump",
    CurrentValue = false,
    Flag = "InfJump",
@@ -83,7 +70,6 @@ local InfJumpToggle = PlayerTab:CreateToggle({
    end,
 })
 
--- Connect Infinite Jump to Roblox's input service
 game:GetService("UserInputService").JumpRequest:Connect(function()
     if InfiniteJumpEnabled then
         if LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
@@ -92,14 +78,10 @@ game:GetService("UserInputService").JumpRequest:Connect(function()
     end
 end)
 
-
--- ==========================================
--- TAB 2: TELEPORTATION
--- ==========================================
+-- TAB 2: TELEPORT
 local TeleportTab = Window:CreateTab("Teleport", 4483345998)
 
--- Teleport to Player Textbox
-local TPInput = TeleportTab:CreateInput({
+TeleportTab:CreateInput({
    Name = "Teleport to Player",
    PlaceholderText = "Type username...",
    RemoveTextAfterFocusLost = false,
@@ -108,7 +90,6 @@ local TPInput = TeleportTab:CreateInput({
         if targetName == "" then return end
         
         for _, player in pairs(Players:GetPlayers()) do
-            -- Checks if the name you typed matches the beginning of a player's name
             if string.sub(string.lower(player.Name), 1, #targetName) == targetName then
                 if LocalPlayer.Character and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
                     LocalPlayer.Character:SetPrimaryPartCFrame(player.Character.HumanoidRootPart.CFrame)
@@ -125,7 +106,6 @@ local TPInput = TeleportTab:CreateInput({
    end,
 })
 
--- Notify that it has successfully loaded
 Rayfield:Notify({
    Title = "Dott Universal",
    Content = "Enjoy using your custom suite!",
